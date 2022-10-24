@@ -221,11 +221,24 @@ This will generate a group of tables (towns) over time (e use the truncateTimeCo
 
 Winner is Bridgeport!
 
-## Number of tanks over time, grouped by substance type
+## Number of tanks, grouped by substance type
 
-Gasoline? Oil? Let's see
+Gasoline? Oil? Let's see what is currently in use, last 15 years:
 
-__TODO__
+```text
+from(bucket: "USTS")
+    |> range(start: -5y)
+    |> filter(fn: (r) => r._measurement == "fuel_tanks" and r._field == "estimated_total_capacity" and r.status == "currently in use")
+    |> group(columns: ["substance_stored"])
+    |> count(column: "_value")
+    |> drop(columns: ["city", "closure_tipe", "construction_type", "overfill_protection", "s2_cell_id", "lat", "lon", "_time", "spill_protection", "status"])
+    |> group()
+    |> sort(columns: ["_value"], desc: true)
+```
+
+And the results:
+
+![](number_of_tanks_grouped_by_substance_type.png)
 
 ## Number of tanks closer to Hartford, CT
 
@@ -263,6 +276,52 @@ from(bucket: "USTS")
 And here are the partial results:
 
 ![](active_tanks_away_from_hartford.png)
+
+# You can also query the data from your favorite programming language
+
+Let's take the query we used to get how many tanks per substance type ara available for a given period time.
+
+```python
+from influxdb_client import InfluxDBClient
+
+# You can generate a Token from the "Tokens Tab" in the UI
+token = "pP25Y9broJWTPfj_nPpSnGtFsoUtutOKsxP-AynRXJAz6fZzdhLCD4NqJC0eg_ImKDczbMQxMSTuhmsJHN7ikA=="
+org = "Kodegeek"
+bucket = "USTS"
+
+with InfluxDBClient(url="http://raspberrypi:8086", token=token, org=org) as client:
+    query = """from(bucket: "USTS")
+    |> range(start: -15y)
+    |> filter(fn: (r) => r._measurement == "fuel_tanks" and r._field == "estimated_total_capacity" and r.status == "currently in use")
+    |> group(columns: ["substance_stored"])
+    |> count(column: "_value")
+    |> drop(
+        columns: [
+            "city",
+            "closure_type",
+            "construction_type",
+            "overfill_protection",
+            "s2_cell_id",
+            "lat",
+            "lon",
+            "_time",
+            "spill_protection",
+            "status",
+        ],
+    )
+    |> group()
+    |> sort(columns: ["_value"], desc: true)"""
+    tables = client.query_api().query(query, org=org)
+    for table in tables:
+        for record in table.records:
+            print(record)
+```
+
+We can do then tweak the Python code and make it better:
+
+[![asciicast](https://asciinema.org/a/531776.svg)](https://asciinema.org/a/531776)
+
+Not so bad. Same can be done in other languages like Java, etc.
 
 # What is next?
 
