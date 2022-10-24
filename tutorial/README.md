@@ -190,5 +190,5 @@ TODO
 * The [Flux language](https://docs.influxdata.com/flux/v0.x/) is an interesting choice compared to plain SQL to analyze time series; I found it intuitive to use, but still learning a few kinks.
 * How fast is Influxdb compared other offerings? You need to decide for yourself. I haven't spent [much time tuning settings](https://www.influxdata.com/blog/optimizing-influxdb-performance-for-high-velocity-data/), instead my initial interest was how easy is to use and integration with other applications, like [Grafana](https://grafana.com).
 * If you write scripts in Python, you should definitely take a look at the [examples from the Git repository](https://github.com/influxdata/influxdb-client-python).
-
+* And of course, [check the source code](https://github.com/josevnz/influxdb_intro) in the repository for this tutorial.
 
