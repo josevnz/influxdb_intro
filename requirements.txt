@@ -1,0 +1,7 @@
+rich==12.6.0
+setuptools==65.5.0
+toml==0.10.2
+influxdb-client==1.33.0
+s2cell
+uszipcode
+levenshtein
