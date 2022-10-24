@@ -1,4 +1,4 @@
-# Influxdb Datasets
+# Influxdb intro
 
 A small project/ tutorial I put together while learning how to use Influxdb for data processing.
 
