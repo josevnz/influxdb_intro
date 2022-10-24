@@ -122,7 +122,7 @@ Using the [CSV annotation](https://docs.influxdata.com/influxdb/v2.4/write-data/
 
 Then comes the decision on were and how to store the data; Influxdb has the concept of _tags, fields and measurements_ on, explained on [understanding-Influxdb-basics](https://www.influxdata.com/resources/understanding-Influxdb-basics/):
 
-* A _bucket_ is nothing else but the database where the data will be stored; We will call ours 'covid19'
+* A _bucket_ is nothing else but the database where the data will be stored
 * Influxdb stores data into _measurements_ (Equivalent of a table on relational databases); Ours will be 'schools'.
 * _Tags_: they are a combination of keys and values, they are used on indexes and their values do not change over time; think about them as metadata. In our case, the 'School name', 'City' are tags.
 * _Fields_: They change over time, they are not indexed. The school total is a counter that will change over time.
