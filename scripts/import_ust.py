@@ -173,14 +173,14 @@ def import_data(url: str, token: str, org: str, bucket: str, data_file: Path, tr
                                     last_used = START_OF_TIME_DATE
                             else:
                                 last_used = datetime.strptime(f"{row[UstToken.LAST_USED_DATE]}", "%m/%d/%Y")
-                            city = row[UstToken.CITY].strip()
-                            closure_type = row[UstToken.CLOSURE_TYPE].strip()
-                            construction_type = row[UstToken.CONSTRUCTION_TYPE_PIPING].strip()
+                            city = row[UstToken.CITY].strip().capitalize()
+                            closure_type = row[UstToken.CLOSURE_TYPE].strip().lower()
+                            construction_type = row[UstToken.CONSTRUCTION_TYPE_PIPING].strip().lower()
                             estimated_total_capacity = int(row[UstToken.ESTIMATED_TOTAL_CAPACITY].strip())
-                            spill_protection = row[UstToken.SPILL_PROTECTION].strip()
-                            overfill_protection = row[UstToken.OVERFILL_PROTECTION].strip()
-                            substance_stored = row[UstToken.SUBSTANCE_STORED].strip()
-                            status = row[UstToken.STATUS].strip()
+                            spill_protection = row[UstToken.SPILL_PROTECTION].strip().lower()
+                            overfill_protection = row[UstToken.OVERFILL_PROTECTION].strip().lower()
+                            substance_stored = row[UstToken.SUBSTANCE_STORED].strip().lower()
+                            status = row[UstToken.STATUS].strip().lower()
 
                             """
                             https://docs.influxdata.com/flux/v0.x/stdlib/experimental/geo/
@@ -245,6 +245,7 @@ def import_data(url: str, token: str, org: str, bucket: str, data_file: Path, tr
                             .tag("spill_protection", tank.spill_protection) \
                             .tag("overfill_protection", tank.overfill_protection) \
                             .tag("substance_stored", tank.substance_stored) \
+                            .tag("status", tank.status) \
                             .tag("s2_cell_id", tank.s2_cell_id_token) \
                             .field("lat", tank.lat) \
                             .field("lon", tank.lon) \

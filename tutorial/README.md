@@ -70,7 +70,6 @@ It is a good practice to ask yourself what kind of questions you can answer with
 * Total number of tanks reported (active, inactive)
 * Number of inactive tanks by installation time
 * Number of tanks over type, grouped by substance type
-* Number of tanks by construction type and age
 * Number of tanks closer to Hartford, CT
 
 Based on that, we check the available columns and make a quick rain check on what to ignore during the import process:
@@ -182,7 +181,88 @@ I ended writing a custom importer script ([import_ust.py](../scripts/import_ust.
 
 # Running some queries
 
-TODO
+Finally, time to run a few queries
+
+## Total number of tanks reported (active, inactive)
+
+```text
+from(bucket: "USTS") 
+  |> range(start: -100y)
+  |> filter(fn: (r) => r["_measurement"] == "fuel_tanks")
+  |> filter(fn: (r) => r._field == "estimated_total_capacity")
+  |> group(columns: ["status"])
+  |> count(column: "_value")
+  |> group(columns: ["_value", "status"], mode: "except")
+  |> sort(columns: ["_value"], desc: true)
+```
+
+And we can see we have 3 categories, 25,831 permanently closed tanks in CT.
+
+![](total_number_of_tanks_reported.png)
+
+## Number of closed fuel tanks all time, per city
+
+So quite a bit of 'permanently closed', do they distribute differently over time?
+
+```text
+from(bucket: "USTS")
+    |> range(start: -100y)
+    |> filter(fn: (r) => r._measurement == "fuel_tanks" and r._field == "estimated_total_capacity" and r.status == "permanently closed")
+    |> truncateTimeColumn(unit: 1y)
+    |> group(columns: ["city", "_time"])
+    |> count(column: "_value")
+    |> drop(columns: ["closure_time", "construction_type", "overfill_protection", "substance_stored", "s2_cell_id_token", "lat", "lon"])
+    |> group(columns: ["city"])
+```
+
+This will generate a group of tables (towns) over time (e use the truncateTimeColumn to drop date and time granularity in our series data):
+
+![](number_of_closed_fuel_tanks_all_time_per_city.png)
+
+Winner is Bridgeport!
+
+## Number of tanks over time, grouped by substance type
+
+Gasoline? Oil? Let's see
+
+__TODO__
+
+## Number of tanks closer to Hartford, CT
+
+At the time of this writing (influx 2.4.0) this something that is _labeled as experimental on Influxdb_; native support of geolocation capabilities inside the database [is a very useful feature](https://docs.influxdata.com/influxdb/cloud/query-data/flux/geo/), let's explore it next.
+
+If you want to take a quick taste of the geolocation capabilities, you could run the following on a notebook:
+
+```text
+import "influxdata/influxdb/sample"
+import "experimental/geo"
+sampleGeoData = sample.data(set: "birdMigration")
+sampleGeoData
+    |> geo.filterRows(region: {lat: 30.04, lon: 31.23, radius: 200.0}, strict: true)
+```
+
+First, a bit of geography:
+
+> Hartford, CT, USA Latitude and longitude [coordinates are: 41.763710, -72.685097](https://www.latlong.net/place/hartford-ct-usa-2637.html).
+
+Count tanks within 30 miles (48.28032 Kilometers) radio from our Hartford coordinates, last 5 years:
+
+```text
+import "experimental/geo"
+from(bucket: "USTS")
+    |> range(start: -5y)
+    |> filter(fn: (r) => r._measurement == "fuel_tanks" or r._field == "lat" or r.field == "lon" and r.status == "currently in use")
+    |> geo.filterRows(region: {lat: 41.763710, lon: -72.685097, radius: 48.28032}, strict: false)
+    |> drop(columns: ["closure_time", "construction_type", "overfill_protection", "substance_stored", "s2_cell_id_token", "lat", "lon", "spill_protection", "s2_cell_id", "_time", "status", "closure_type"])
+    |> count(column: "estimated_total_capacity")
+    |> group(columns: ["city"])
+    |> group()
+    |> sort(columns: ["estimated_total_capacity"], desc: true)
+```
+
+And here are the partial results:
+
+![](active_tanks_away_from_hartford.png)
 
 # What is next?
 
