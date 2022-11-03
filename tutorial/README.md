@@ -219,7 +219,7 @@ This will generate a group of tables (towns) over time (e use the truncateTimeCo
 
 ![](number_of_closed_fuel_tanks_all_time_per_city.png)
 
-Winner is Bridgeport!
+Winner has 80 tanks on the graphic.
 
 ## Number of tanks, grouped by substance type
 
