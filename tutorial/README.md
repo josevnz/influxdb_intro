@@ -1,5 +1,7 @@
 # Analyzing time series data with Python and Influxdb, using public domain datasets
 
+![](mazinger-z.png)
+
 These days you get time series data from multiple sources; you may also argue than using a traditional relational database may not work well with this data because of the following:
 
 * Every datasource requires a custom schema; This means you need to spend more time deciding how to store your data, and if there are changes on the underlying data source then you may have to alter your table schemas

@@ -1,5 +1,7 @@
 # Influxdb intro
 
+![](mazinger-z.png)
+
 A small project/ tutorial I put together while learning how to use Influxdb for data processing.
 
 Please read the [tutorial/README](tutorial/README.md) file for details.
